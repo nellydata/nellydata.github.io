@@ -1,0 +1,11 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1200" height="675" fill="#111018"/>
+<rect x="120" y="105" width="960" height="465" rx="20" fill="#242131" stroke="#B896FF" stroke-width="4"/>
+<rect x="170" y="160" width="500" height="34" rx="8" fill="#B896FF"/>
+<rect x="170" y="230" width="760" height="24" rx="8" fill="#C5BFD0" fill-opacity="0.7"/>
+<rect x="170" y="280" width="670" height="24" rx="8" fill="#C5BFD0" fill-opacity="0.5"/>
+<rect x="170" y="345" width="280" height="145" rx="12" fill="#1A1824"/>
+<rect x="480" y="345" width="280" height="145" rx="12" fill="#1A1824"/>
+<rect x="790" y="345" width="240" height="145" rx="12" fill="#1A1824"/>
+<text x="600" y="625" text-anchor="middle" fill="#F5F3FA" font-family="Arial" font-size="30">Replace with a project screenshot</text>
+</svg>
