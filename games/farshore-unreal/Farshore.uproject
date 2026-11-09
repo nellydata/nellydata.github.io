@@ -1,0 +1,9 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Games",
+  "Description": "Farshore Unreal desktop prototype",
+  "Modules": [
+    { "Name": "Farshore", "Type": "Runtime", "LoadingPhase": "Default" }
+  ]
+}
