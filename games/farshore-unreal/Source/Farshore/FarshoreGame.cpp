@@ -2,6 +2,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/DirectionalLightComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkyLightComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -228,7 +229,13 @@ void AFarshoreGameMode::BuildIsland()
         }
         StoneMarkers.Add(Marker);
     }
-    GetWorld()->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), FRotator(-55, -30, 0));
+    if (ADirectionalLight* Key = GetWorld()->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), FRotator(-55, -30, 0)))
+        Key->GetLightComponent()->SetIntensity(1.0f);
+    if (ADirectionalLight* Fill = GetWorld()->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), FRotator(-45, 150, 0)))
+    {
+        Fill->GetLightComponent()->SetIntensity(0.65f);
+        Fill->GetLightComponent()->SetCastShadows(false);
+    }
     if (ASkyLight* Sky = GetWorld()->SpawnActor<ASkyLight>())
     {
         Sky->GetLightComponent()->SetMobility(EComponentMobility::Movable);
@@ -299,7 +306,9 @@ void AFarshoreGameMode::CaptureFrame()
 void AFarshoreGameMode::RunSmokeTest()
 {
     ACharacter* Player = UGameplayStatics::GetPlayerCharacter(this, 0);
-    bool bPassed = Player && StoneMarkers.Num() == 3 && FoundCount() == 0;
+    FLinearColor TestColor;
+    bool bPassed = Player && BaseMaterial && BaseMaterial->GetVectorParameterValue(FMaterialParameterInfo(TEXT("Color")), TestColor) &&
+        StoneMarkers.Num() == 3 && FoundCount() == 0;
     if (bPassed)
     {
         Player->SetActorLocation(FVector(250, 0, 90), false, nullptr, ETeleportType::TeleportPhysics);
@@ -327,6 +336,8 @@ void AFarshoreHUD::DrawHUD()
     Super::DrawHUD();
     if (const AFarshoreGameMode* Game = GetWorld()->GetAuthGameMode<AFarshoreGameMode>())
     {
+        DrawRect(FLinearColor(0.03f, 0.10f, 0.11f, 0.8f), 16, 14, 310, 34);
+        DrawRect(FLinearColor(0.03f, 0.10f, 0.11f, 0.8f), 16, Canvas->SizeY - 65, Canvas->SizeX - 32, 38);
         DrawText(FString::Printf(TEXT("FARSHORE  /  WINDSTONES %d / 3"), Game->FoundCount()),
                  FLinearColor::White, 28, 24, GEngine->GetSmallFont(), 1.3f);
         DrawText(Game->Message, FLinearColor::White, 28, Canvas->SizeY - 55, GEngine->GetSmallFont(), 1.2f);
