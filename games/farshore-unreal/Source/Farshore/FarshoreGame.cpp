@@ -132,7 +132,7 @@ void AFarshoreGameMode::BeginPlay()
     if (FParse::Param(FCommandLine::Get(), TEXT("FarshoreCapture")))
     {
         FTimerHandle Timer;
-        GetWorldTimerManager().SetTimer(Timer, this, &AFarshoreGameMode::CaptureFrame, 4.0f, false);
+        GetWorldTimerManager().SetTimer(Timer, this, &AFarshoreGameMode::CaptureFrame, 30.0f, false);
     }
 #endif
 }
