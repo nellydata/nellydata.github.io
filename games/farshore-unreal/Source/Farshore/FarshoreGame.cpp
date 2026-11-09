@@ -3,10 +3,12 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SkyLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/Canvas.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/Engine.h"
+#include "Engine/SkyLight.h"
 #include "Engine/StaticMeshActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -50,7 +52,7 @@ AFarshoreCharacter::AFarshoreCharacter()
     Camera->OrthoWidth = 2100;
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
-    static ConstructorHelpers::FObjectFinder<UMaterialInterface> Material(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> Material(TEXT("/Game/Farshore/M_FarshoreTint.M_FarshoreTint"));
     auto MakePart = [&](const TCHAR* Name, FVector Location, FVector Scale, FLinearColor Color)
     {
         UStaticMeshComponent* Part = CreateDefaultSubobject<UStaticMeshComponent>(Name);
@@ -104,7 +106,7 @@ AFarshoreGameMode::AFarshoreGameMode()
     HUDClass = AFarshoreHUD::StaticClass();
     static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-    static ConstructorHelpers::FObjectFinder<UMaterialInterface> Material(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> Material(TEXT("/Game/Farshore/M_FarshoreTint.M_FarshoreTint"));
     Cube = CubeMesh.Object;
     Sphere = SphereMesh.Object;
     BaseMaterial = Material.Object;
@@ -183,6 +185,11 @@ void AFarshoreGameMode::BuildIsland()
     AddShape(Cube, FVector(0, 0, -100), FVector(100, 100, .2), FLinearColor(.19, .40, .47), false);
     AddShape(Cube, FVector(0, 0, -40), FVector(32, 32, .8), FLinearColor(.34, .43, .37), true);
     AddShape(Cube, FVector(0, 0, -5), FVector(31, 31, .1), FLinearColor(.35, .57, .36), true);
+    for (float Side : {-1.0f, 1.0f})
+    {
+        AddShape(Cube, FVector(Side * 1550, 0, 25), FVector(.3, 31, .5), FLinearColor(.38, .45, .36), true);
+        AddShape(Cube, FVector(0, Side * 1550, 25), FVector(31, .3, .5), FLinearColor(.38, .45, .36), true);
+    }
     AddShape(Cube, FVector(0, 0, 2), FVector(24, 3.2, .04), FLinearColor(.68, .62, .43), false);
     AddShape(Cube, FVector(700, 0, 3), FVector(2.5, 21, .04), FLinearColor(.68, .62, .43), false);
     AddShape(Cube, FVector(0, 0, 160), FVector(2, 2, 3.2), FLinearColor(.55, .60, .51), true);
@@ -211,10 +218,23 @@ void AFarshoreGameMode::BuildIsland()
             Component->SetStaticMesh(Sphere);
             Component->SetWorldScale3D(FVector(.6, .6, 1.0));
             Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            if (BaseMaterial)
+            {
+                UMaterialInstanceDynamic* Material = UMaterialInstanceDynamic::Create(BaseMaterial, Component);
+                Material->SetVectorParameterValue(TEXT("Color"), I == 0 ? FLinearColor(.7, 1, .6) :
+                    (I == 1 ? FLinearColor(1, .8, .45) : FLinearColor(.5, .9, 1)));
+                Component->SetMaterial(0, Material);
+            }
         }
         StoneMarkers.Add(Marker);
     }
     GetWorld()->SpawnActor<ADirectionalLight>(FVector(0, 0, 1000), FRotator(-55, -30, 0));
+    if (ASkyLight* Sky = GetWorld()->SpawnActor<ASkyLight>())
+    {
+        Sky->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+        Sky->GetLightComponent()->SetIntensity(1.0f);
+        Sky->GetLightComponent()->RecaptureSky();
+    }
 }
 
 int32 AFarshoreGameMode::FoundCount() const

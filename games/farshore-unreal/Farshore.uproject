@@ -5,5 +5,8 @@
   "Description": "Farshore Unreal desktop prototype",
   "Modules": [
     { "Name": "Farshore", "Type": "Runtime", "LoadingPhase": "Default" }
+  ],
+  "Plugins": [
+    { "Name": "PythonScriptPlugin", "Enabled": true, "TargetAllowList": ["Editor"] }
   ]
 }
