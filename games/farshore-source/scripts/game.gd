@@ -14,6 +14,9 @@ const STONES := [
 ]
 const TOWER := Vector3(0, 0, 0)
 const SPAWN := Vector3(-3, 0, 8)
+const PLAYER_RADIUS := 0.32
+const WALK_SPEED := 4.2
+const TOWER_REACH := 2.8
 
 var view: PixelView
 var rig: FollowCamera
@@ -25,6 +28,9 @@ var complete := false
 var playing := false
 var held := {"up": false, "down": false, "left": false, "right": false}
 var walk_time := 0.0
+var facing := "down"
+var hero_frames: Dictionary = {}
+var obstacles: Array[Dictionary] = []
 var near_index := -1
 var panel: PanelContainer
 var panel_title: Label
@@ -69,13 +75,40 @@ func _process(delta: float) -> void:
 		float(Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN) or held.down) - float(Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_UP) or held.up)
 	).normalized()
 	if direction.length_squared() > 0.0:
-		hero.position.x = clampf(hero.position.x + direction.x * delta * 4.2, -14.5, 14.5)
-		hero.position.z = clampf(hero.position.z + direction.y * delta * 4.2, -14.5, 14.5)
-		walk_time += delta
-		hero_sprite.flip_h = direction.x < 0.0 if absf(direction.x) > 0.1 else hero_sprite.flip_h
-		hero_sprite.modulate = Color(1.0, 0.97 + 0.03 * sin(walk_time * 12.0), 0.95 + 0.05 * sin(walk_time * 12.0))
+		facing = ("right" if direction.x > 0.0 else "left") if absf(direction.x) > absf(direction.y) else ("down" if direction.y > 0.0 else "up")
+		var before := hero.position
+		_move_hero(direction * delta * WALK_SPEED)
+		if hero.position.distance_squared_to(before) > 0.000001:
+			walk_time += delta
+			hero_sprite.texture = hero_frames[facing][1 + int(walk_time * 7.0) % 2]
+		else:
+			hero_sprite.texture = hero_frames[facing][0]
+	else:
+		walk_time = 0.0
+		hero_sprite.texture = hero_frames[facing][0]
 	RenderingServer.global_shader_parameter_set("player_world_pos", hero.global_position)
 	_update_context()
+
+
+func _move_hero(motion: Vector2) -> void:
+	var steps := maxi(1, ceili(motion.length() / 0.15))
+	var step := motion / float(steps)
+	for i in steps:
+		for axis: Vector2 in [Vector2(step.x, 0), Vector2(0, step.y)]:
+			var current := Vector2(hero.position.x, hero.position.z)
+			var next: Vector2 = (current + axis).clamp(Vector2(-14.5, -14.5), Vector2(14.5, 14.5))
+			var blocked := false
+			for obstacle in obstacles:
+				var center: Vector2 = obstacle.center
+				var radius: float = obstacle.radius + PLAYER_RADIUS
+				var old_dist := current.distance_squared_to(center)
+				var new_dist := next.distance_squared_to(center)
+				if new_dist < radius * radius and new_dist < old_dist:
+					blocked = true
+					break
+			if not blocked:
+				hero.position.x = next.x
+				hero.position.z = next.y
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -159,10 +192,12 @@ func _build_world() -> void:
 	kit.cylinder("rock", Vector3(0, 0.35, 0), 0.9, 3.8, 8)
 	kit.cylinder("dark", Vector3(0, 4.15, 0), 1.1, 0.28, 8)
 	kit.cylinder("roof", Vector3(0, 4.43, 0), 1.0, 0.8, 8, true, Color.WHITE, 0.0)
+	obstacles.append({"center": Vector2.ZERO, "radius": 2.0})
 	for s in STONES:
 		var p: Vector3 = s.position
 		kit.cylinder("rock", p, 0.95, 0.32, 8)
 		kit.cylinder("dark", p + Vector3(0, 0.32, 0), 0.45, 0.72, 8)
+		obstacles.append({"center": Vector2(p.x, p.z), "radius": 0.8})
 	kit.build(world)
 	var tree_tex := ImageTexture.create_from_image(_tree_art())
 	var grass_tex := ImageTexture.create_from_image(_grass_art())
@@ -182,6 +217,7 @@ func _build_world() -> void:
 		tree.position = p
 		tree.modulate = Color.from_hsv(0.31 + rng.randf_range(-0.02, 0.02), 0.75, rng.randf_range(0.84, 1.0))
 		world.add_child(tree)
+		obstacles.append({"center": Vector2(p.x, p.z), "radius": 0.35})
 	for i in 65:
 		var p := Vector3(rng.randf_range(-14, 14), 0.02, rng.randf_range(-14, 14))
 		if absf(p.x) < 1.8 or absf(p.z + 7) < 1.3:
@@ -202,10 +238,13 @@ func _build_world() -> void:
 	hero = Node3D.new()
 	hero.position = SPAWN
 	world.add_child(hero)
-	hero_sprite = Billboard.make(ImageTexture.create_from_image(_hero_art()), 16.0, false)
-	hero_sprite.no_depth_test = true
+	for direction in ["down", "up", "left", "right"]:
+		var frames: Array[ImageTexture] = []
+		for step in 3:
+			frames.append(ImageTexture.create_from_image(_hero_art(direction, step)))
+		hero_frames[direction] = frames
+	hero_sprite = Billboard.make(hero_frames.down[0], 16.0, false)
 	hero.add_child(hero_sprite)
-	view.keep_pixel_exact(hero_sprite)
 	rig = FollowCamera.new()
 	rig.base = {"pitch": 38.0, "distance": 17.0, "fov": 38.0, "height": 0.9, "yaw": 0.0}
 	rig.bounds = AABB(Vector3(-16, -5, -16), Vector3(32, 20, 32))
@@ -255,21 +294,28 @@ func _crystal_art(color: Color) -> Image:
 	return image
 
 
-func _hero_art() -> Image:
+func _hero_art(direction: String, step: int) -> Image:
 	var image := Image.create(22, 38, false, Image.FORMAT_RGBA8)
 	image.fill_rect(Rect2i(7, 3, 8, 8), Color("62483c"))
-	image.fill_rect(Rect2i(7, 5, 8, 6), Color("dba781"))
+	if direction != "up":
+		image.fill_rect(Rect2i(7, 5, 8, 6), Color("dba781"))
 	image.fill_rect(Rect2i(5, 2, 12, 4), Color("394b59"))
 	image.fill_rect(Rect2i(4, 11, 14, 13), Color("3d7980"))
 	image.fill_rect(Rect2i(6, 11, 10, 3), Color("d98061"))
-	image.fill_rect(Rect2i(15, 13, 4, 10), Color("ad6251"))
-	image.fill_rect(Rect2i(3, 13, 3, 11), Color("dba781"))
-	image.fill_rect(Rect2i(7, 24, 4, 11), Color("364b50"))
-	image.fill_rect(Rect2i(12, 24, 4, 11), Color("364b50"))
-	image.fill_rect(Rect2i(6, 34, 5, 3), Color("6c4a3c"))
-	image.fill_rect(Rect2i(12, 34, 5, 3), Color("6c4a3c"))
-	image.fill_rect(Rect2i(8, 7, 1, 1), Color("283a3c"))
-	image.fill_rect(Rect2i(13, 7, 1, 1), Color("283a3c"))
+	if direction == "up":
+		image.fill_rect(Rect2i(6, 14, 10, 9), Color("ad6251"))
+	var stride := 0 if step == 0 else (2 if step == 1 else -2)
+	image.fill_rect(Rect2i(16, 13 + stride, 3, 10), Color("dba781"))
+	image.fill_rect(Rect2i(3, 13 - stride, 3, 10), Color("dba781"))
+	image.fill_rect(Rect2i(7 + stride, 24, 4, 10), Color("364b50"))
+	image.fill_rect(Rect2i(12 - stride, 24, 4, 10), Color("364b50"))
+	image.fill_rect(Rect2i(6 + stride, 34, 5, 3), Color("6c4a3c"))
+	image.fill_rect(Rect2i(12 - stride, 34, 5, 3), Color("6c4a3c"))
+	if direction == "down":
+		image.fill_rect(Rect2i(8, 7, 1, 1), Color("283a3c"))
+		image.fill_rect(Rect2i(13, 7, 1, 1), Color("283a3c"))
+	elif direction != "up":
+		image.fill_rect(Rect2i(8 if direction == "left" else 13, 7, 1, 1), Color("283a3c"))
 	return image
 
 
@@ -395,7 +441,7 @@ func _update_context() -> void:
 			n += 1
 		elif hero.position.distance_to(STONES[i].position) < 2.1:
 			near_index = i
-	var near_tower := hero.position.distance_to(TOWER) < 2.5
+	var near_tower := hero.position.distance_to(TOWER) < TOWER_REACH
 	progress.text = "STONES  %d / 3" % n
 	if near_index >= 0:
 		hint.text = STONES[near_index].name
@@ -419,7 +465,7 @@ func _interact() -> void:
 		_save_progress()
 		_play_sound(index)
 		_show_panel(STONES[index].name.to_upper(), STONES[index].line + "\n\nA windstone answers. Its light will guide you back to the tower.", "CONTINUE")
-	elif hero.position.distance_to(TOWER) < 2.5:
+	elif hero.position.distance_to(TOWER) < TOWER_REACH:
 		if found.all(func(value: bool) -> bool: return value):
 			complete = true
 			_save_progress()
