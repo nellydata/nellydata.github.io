@@ -3,98 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NellyData is an independent game studio developing original interactive work.">
-    <meta name="theme-color" content="#090a0b">
-    <title>NellyData | A Studio</title>
+    <meta name="description" content="Nelson Ayoola's portfolio: game development, data projects, education, and experience.">
+    <meta name="theme-color" content="#f5f3ed">
+    <title>Nelson Ayoola | NellyData</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
         <div class="container nav-wrapper">
-            <a class="site-title" href="#home">NellyData</a>
+            <a class="brand" href="#home" aria-label="NellyData, back to top"><span class="brand-mark">n.</span> NellyData</a>
             <nav aria-label="Main navigation">
                 <ul class="nav-list">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#studio">Studio</a></li>
                     <li><a href="#work">Work</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#credentials">Credentials</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main>
-        <section id="home" class="hero">
-            <div class="container hero-content">
+    <main id="main">
+        <section class="hero" id="home">
+            <div class="container hero-layout">
                 <div>
-                    <p class="eyebrow">Independent Game Studio</p>
-                    <h1><span>NellyData</span></h1>
-                    <p class="hero-text">
-                        Original games in development.
-                    </p>
+                    <p class="eyebrow"><span class="status-dot"></span> Game development &amp; more</p>
+                    <h1>Hi, I'm Nelson.<br><em>I like making things.</em></h1>
+                    <p class="hero-copy">I'm a game development student with a background in data and operations. This is a home for the games, experiments, and skills I'm building along the way.</p>
                     <div class="button-row">
-                        <a class="button primary" href="#work">Current Work</a>
-                        <a class="button secondary" href="https://github.com/nellydata" target="_blank" rel="noopener">GitHub</a>
+                        <a class="button button-dark" href="#work">Explore my work <span aria-hidden="true">↗</span></a>
+                        <a class="text-link" href="assets/Nelson-Ayoola-Resume.pdf">View résumé <span aria-hidden="true">↗</span></a>
                     </div>
                 </div>
-
-                <aside class="hero-mark" aria-label="NellyData studio mark">
-                    <div class="hero-mark-frame">
-                        <span class="mark-kicker">NELLYDATA</span>
-                        <span class="mark-rule"></span>
-                        <strong>STUDIO</strong>
-                        <span class="mark-subtitle">IN DEVELOPMENT</span>
-                        <span class="mark-sigil" aria-hidden="true">ND</span>
-                    </div>
+                <aside class="hero-note" aria-label="About this portfolio">
+                    <div class="note-top"><span>THE WORKBENCH</span><span>01 / 03</span></div>
+                    <div class="note-art" aria-hidden="true"><span>✳</span><i></i><b>ND</b></div>
+                    <p>A place for finished projects, works in progress, and everything learned in between.</p>
+                    <span class="note-footer">MADE BY NELSON AYOOLA</span>
                 </aside>
             </div>
+            <div class="container hero-bottom"><span>INDEPENDENT WORK &amp; LEARNING</span><span>SCROLL TO EXPLORE ↓</span></div>
         </section>
 
-        <section id="studio" class="section">
-            <div class="container narrow">
-                <p class="section-label">Studio</p>
-                <h2>Built around original worlds.</h2>
-                <p>
-                    NellyData is an independent game studio focused on original interactive work with a strong
-                    emphasis on atmosphere, worldbuilding, and systems that hold up in play.
-                </p>
-                <p>
-                    The studio is currently in active production on its next project. Public material will be
-                    released gradually as the work reaches the right stage.
-                </p>
-            </div>
-        </section>
-
-        <section id="work" class="section alternate-background">
+        <section class="section work-section" id="work">
             <div class="container">
-                <p class="section-label">Current Work</p>
-                <h2>Games &amp; experiments.</h2>
-                <p class="section-intro">
-                    Playable prototypes and original worlds from NellyData. Explore the projects and inspect the source.
-                </p>
+                <div class="section-heading">
+                    <div><p class="eyebrow">01 / Selected work</p><h2>Things I've made.</h2></div>
+                    <p>Some projects are playable, others are learning exercises. Each one is part of the process.</p>
+                </div>
+
+                <article class="featured-project">
+                    <div class="project-image">
+                        <img src="images/mosslight-village.png" alt="Pixel-art village from Mosslight: The Bellkeeper's Road" loading="lazy">
+                        <span class="image-label">FEATURED PROJECT / 01</span>
+                    </div>
+                    <div class="featured-content">
+                        <div class="project-meta"><span class="pill">Playable quest</span><span>GODOT · RPG</span></div>
+                        <h3>Mosslight: The Bellkeeper's Road</h3>
+                        <p>A small pixel-art RPG about restoring a village's voice. Explore, meet forest guardians, and collect lost bell notes in a turn-based adventure.</p>
+                        <div class="project-links">
+                            <a class="button button-dark" href="https://github.com/nellydata/mosslight-the-bellkeepers-road/releases/tag/v1.0.0">Download release <span aria-hidden="true">↗</span></a>
+                            <a class="text-link" href="https://github.com/nellydata/mosslight-the-bellkeepers-road">View source <span aria-hidden="true">↗</span></a>
+                        </div>
+                        <p class="availability">The browser version is also available on <a href="https://nellydata.tailc1afc1.ts.net:10000/mosslight/index.html?v=mosslight-20261029-v1">the project host</a>; access may require a Tailscale connection.</p>
+                    </div>
+                </article>
 
                 <div class="project-grid">
                     <article class="project-card">
-                        <img src="https://raw.githubusercontent.com/nellydata/mosslight-the-bellkeepers-road/main/game/assets/village.png" alt="Mosslight pixel-art forest village, with a bell tower, moonlit pond, inn, and winding paths" loading="lazy">
-                        <div class="project-content">
-                            <p class="project-type">Playable RPG · Godot · 2026</p>
-                            <h3>Mosslight: The Bellkeeper's Road</h3>
-                            <p>Explore a twilight village, face three forest guardians in turn-based battles, collect the lost bell notes, and restore the village's voice. An original pixel-art RPG with mobile browser support and saved progress.</p>
-                            <div class="button-row">
-                                <a class="button primary" href="https://nellydata.tailc1afc1.ts.net:10000/mosslight/index.html?v=mosslight-20261029-v1" target="_blank" rel="noopener noreferrer">Play Mosslight</a>
-                                <a class="button secondary" href="https://github.com/nellydata/mosslight-the-bellkeepers-road" target="_blank" rel="noopener noreferrer">View Source on GitHub</a>
-                                <a class="button secondary" href="https://github.com/nellydata/mosslight-the-bellkeepers-road/releases/tag/v1.0.0" target="_blank" rel="noopener noreferrer">Download Release</a>
-                            </div>
-                        </div>
+                        <div class="card-top"><span>02 / COURSE PROJECT</span><span aria-hidden="true">↗</span></div>
+                        <div><p class="project-category">C++17 · CONSOLE RPG</p><h3>Micare: Cathedral of Lies</h3><p>A course project combining exploration, investigation, turn-based combat, and character progression in a C++ console game.</p></div>
+                        <a class="text-link" href="https://github.com/nellydata/MysteryRPG-PP1">Explore the project <span aria-hidden="true">↗</span></a>
+                    </article>
+                    <article class="project-card">
+                        <div class="card-top"><span>03 / DATA PROJECT</span><span aria-hidden="true">↗</span></div>
+                        <div><p class="project-category">TABLEAU · DATA VISUALIZATION</p><h3>Bikeshare analysis</h3><p>A look at bikeshare data and usage patterns, using Tableau to turn trip data into visual insights.</p></div>
+                        <a class="text-link" href="https://github.com/nellydata/Bikeshare-Project-tableau">Explore the project <span aria-hidden="true">↗</span></a>
+                    </article>
+                </div>
+                <div class="work-in-progress">
+                    <div><p class="eyebrow">Beyond the highlights</p><h3>Not everything is finished, and that's okay.</h3></div>
+                    <p>There are more ideas and experiments at different stages. I share work when it's ready to be useful, and keep learning from the pieces that aren't there yet.</p>
+                    <a class="text-link" href="https://github.com/nellydata">See public repositories <span aria-hidden="true">↗</span></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section about-section" id="about">
+            <div class="container about-layout">
+                <div><p class="eyebrow">02 / A little about me</p><h2>Curious by nature.<br><em>Learning by doing.</em></h2></div>
+                <div class="about-copy">
+                    <p>I'm Nelson Ayoola, the person behind NellyData. I'm studying game development and building projects that bring together programming, systems, and storytelling.</p>
+                    <p>Before and alongside development, I've worked in operations, executive support, and data analysis. Those experiences taught me to stay organized, solve practical problems, and keep people in mind.</p>
+                    <div class="skill-list" aria-label="Areas of experience"><span>C++</span><span>Godot</span><span>Python</span><span>SQL</span><span>Tableau</span><span>Git &amp; GitHub</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section credentials-section" id="credentials">
+            <div class="container">
+                <div class="section-heading">
+                    <div><p class="eyebrow">03 / Background</p><h2>Learning &amp; experience.</h2></div>
+                    <p>A little context behind the work. For a fuller picture, my résumé includes professional experience and project details.</p>
+                </div>
+                <div class="credentials-grid">
+                    <article class="credential-card">
+                        <p class="card-number">01 / EDUCATION</p>
+                        <h3>Building the foundation</h3>
+                        <div class="credential-item"><strong>Full Sail University</strong><span>Game Development, undergraduate · In progress</span></div>
+                        <div class="credential-item"><strong>Olivet Nazarene University</strong><span>Business Studies · 2021–2023</span></div>
+                    </article>
+                    <article class="credential-card">
+                        <p class="card-number">02 / CERTIFICATIONS</p>
+                        <h3>Continuing to learn</h3>
+                        <div class="credential-item"><strong>Data Analytics Immersive</strong><span>General Assembly</span></div>
+                        <div class="credential-item"><strong>Excel Associate</strong><span>Microsoft Office Specialist</span></div>
+                        <div class="credential-item"><strong>SQL Intermediate Certificate</strong><span>See résumé for details</span></div>
+                    </article>
+                    <article class="credential-card">
+                        <p class="card-number">03 / EXPERIENCE</p>
+                        <h3>Practical experience</h3>
+                        <p>Experience supporting teams and daily operations across education, retail, and healthcare, alongside technical and data projects.</p>
+                        <a class="text-link" href="assets/Nelson-Ayoola-Resume.pdf">Read my résumé <span aria-hidden="true">↗</span></a>
                     </article>
                 </div>
             </div>
         </section>
-    </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 NellyData.</p>
-        </div>
-    </footer>
+        <section class="contact-section" id="contact">
+            <div class="container contact-layout">
+                <div><p class="eyebrow">Say hello</p><h2>Thanks for stopping by.</h2><p>Interested in the work or want to connect? You can find me here.</p></div>
+                <div class="contact-links">
+                    <a href="https://github.com/nellydata"><span>GitHub</span><span aria-hidden="true">↗</span></a>
+                    <a href="https://www.linkedin.com/in/nelson-a-83008a251/"><span>LinkedIn</span><span aria-hidden="true">↗</span></a>
+                    <a href="assets/Nelson-Ayoola-Resume.pdf"><span>Résumé</span><span aria-hidden="true">↗</span></a>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer><div class="container footer-inner"><span>© 2026 Nelson Ayoola / NellyData</span><a href="#home">Back to top ↑</a></div></footer>
 </body>
 </html>
