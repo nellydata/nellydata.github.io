@@ -1,7 +1,5 @@
-# NellyData
+# NellyData portfolio
 
-NellyData is an independent game studio developing original interactive work.
+The source for Nelson Ayoola's portfolio, featuring selected game and data projects, background, and credentials. The site is a static HTML and CSS page hosted with GitHub Pages.
 
-The studio is currently in active production on an upcoming title. Public materials, artwork, screenshots, and project information will be released as development progresses.
-
-This repository contains the source for the NellyData website.
+Edit `index.html` to update projects, status, experience, or credentials, and `css/style.css` for the design. The résumé linked from the site is in `assets/`.
