@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://d0jwq8y2t3n2w"
+path="res://.godot/imported/hd2d_body.fnt-cb3de311a7941397fe748bbc73fb1d3c.fontdata"
+
+[deps]
+
+source_file="res://assets/fonts/hd2d_body.fnt"
+dest_files=["res://.godot/imported/hd2d_body.fnt-cb3de311a7941397fe748bbc73fb1d3c.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2
