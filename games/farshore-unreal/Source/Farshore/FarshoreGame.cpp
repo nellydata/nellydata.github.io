@@ -13,11 +13,20 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
 {
-const TCHAR* SaveSlot = TEXT("FarshoreUnreal");
+const TCHAR* SaveSlot()
+{
+#if WITH_DEV_AUTOMATION_TESTS
+    if (FParse::Param(FCommandLine::Get(), TEXT("FarshoreSmoke"))) return TEXT("FarshoreAutomatedSmoke");
+#endif
+    return TEXT("FarshoreUnreal");
+}
 const FVector StartPosition(-800, -300, 90);
 }
 
@@ -105,13 +114,29 @@ void AFarshoreGameMode::BeginPlay()
 {
     Super::BeginPlay();
     BuildIsland();
+#if WITH_DEV_AUTOMATION_TESTS
+    if (FParse::Param(FCommandLine::Get(), TEXT("FarshoreSmoke")) && UGameplayStatics::DoesSaveGameExist(SaveSlot(), 0))
+        UGameplayStatics::DeleteGameInSlot(SaveSlot(), 0);
+#endif
+    GetWorldTimerManager().SetTimerForNextTick(this, &AFarshoreGameMode::InitializePlayer);
+#if WITH_DEV_AUTOMATION_TESTS
+    if (FParse::Param(FCommandLine::Get(), TEXT("FarshoreSmoke")))
+    {
+        FTimerHandle Timer;
+        GetWorldTimerManager().SetTimer(Timer, this, &AFarshoreGameMode::RunSmokeTest, 2.0f, false);
+    }
+#endif
+}
+
+void AFarshoreGameMode::InitializePlayer()
+{
     ACharacter* Player = UGameplayStatics::GetPlayerCharacter(this, 0);
     if (Player)
     {
         FVector Position = StartPosition;
-        if (UGameplayStatics::DoesSaveGameExist(SaveSlot, 0))
+        if (UGameplayStatics::DoesSaveGameExist(SaveSlot(), 0))
         {
-            UFarshoreSave* Save = Cast<UFarshoreSave>(UGameplayStatics::LoadGameFromSlot(SaveSlot, 0));
+            UFarshoreSave* Save = Cast<UFarshoreSave>(UGameplayStatics::LoadGameFromSlot(SaveSlot(), 0));
             if (Save && Save->Found.Num() == 3 && (!Save->bComplete || !Save->Found.Contains(false)))
             {
                 Found = Save->Found;
@@ -125,6 +150,7 @@ void AFarshoreGameMode::BeginPlay()
         for (int32 I = 0; I < StoneMarkers.Num(); ++I)
             if (StoneMarkers[I] && Found[I]) StoneMarkers[I]->SetActorHiddenInGame(true);
     }
+    else UE_LOG(LogTemp, Error, TEXT("Farshore could not find the player character."));
 }
 
 void AFarshoreGameMode::AddShape(UStaticMesh* Mesh, const FVector& Position, const FVector& Scale,
@@ -232,8 +258,35 @@ void AFarshoreGameMode::SaveProgress()
     Save->Found = Found;
     Save->bComplete = bComplete;
     Save->Position = Player->GetActorLocation();
-    if (!UGameplayStatics::SaveGameToSlot(Save, SaveSlot, 0)) Message = TEXT("Unable to save progress.");
+    if (!UGameplayStatics::SaveGameToSlot(Save, SaveSlot(), 0)) Message = TEXT("Unable to save progress.");
 }
+
+#if WITH_DEV_AUTOMATION_TESTS
+void AFarshoreGameMode::RunSmokeTest()
+{
+    ACharacter* Player = UGameplayStatics::GetPlayerCharacter(this, 0);
+    bool bPassed = Player && StoneMarkers.Num() == 3 && FoundCount() == 0;
+    if (bPassed)
+    {
+        Player->SetActorLocation(FVector(250, 0, 90), false, nullptr, ETeleportType::TeleportPhysics);
+        Interact();
+        bPassed = !bComplete && FoundCount() == 0;
+        for (const FVector& Stone : StoneLocations)
+        {
+            Player->SetActorLocation(Stone + FVector(200, 0, 90), false, nullptr, ETeleportType::TeleportPhysics);
+            Interact();
+        }
+        bPassed = bPassed && FoundCount() == 3;
+        Player->SetActorLocation(FVector(250, 0, 90), false, nullptr, ETeleportType::TeleportPhysics);
+        Interact();
+        UFarshoreSave* Saved = Cast<UFarshoreSave>(UGameplayStatics::LoadGameFromSlot(SaveSlot(), 0));
+        bPassed = bPassed && bComplete && Saved && Saved->bComplete && Saved->Found.Num() == 3 && !Saved->Found.Contains(false);
+    }
+    if (UGameplayStatics::DoesSaveGameExist(SaveSlot(), 0)) UGameplayStatics::DeleteGameInSlot(SaveSlot(), 0);
+    UE_LOG(LogTemp, Display, TEXT("FARSHORE_SMOKE_%s"), bPassed ? TEXT("PASS") : TEXT("FAIL"));
+    FPlatformMisc::RequestExit(false);
+}
+#endif
 
 void AFarshoreHUD::DrawHUD()
 {

@@ -65,7 +65,11 @@ public:
 
 private:
     void BuildIsland();
+    void InitializePlayer();
     void SaveProgress();
+#if WITH_DEV_AUTOMATION_TESTS
+    void RunSmokeTest();
+#endif
     UPROPERTY() TObjectPtr<UStaticMesh> Cube;
     UPROPERTY() TObjectPtr<UStaticMesh> Sphere;
     UPROPERTY() TObjectPtr<UMaterialInterface> BaseMaterial;
