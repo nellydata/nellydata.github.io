@@ -69,6 +69,7 @@ private:
     void SaveProgress();
 #if WITH_DEV_AUTOMATION_TESTS
     void RunSmokeTest();
+    void CaptureFrame();
 #endif
     UPROPERTY() TObjectPtr<UStaticMesh> Cube;
     UPROPERTY() TObjectPtr<UStaticMesh> Sphere;

@@ -15,8 +15,10 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Misc/Paths.h"
 #include "TimerManager.h"
 #include "UObject/ConstructorHelpers.h"
+#include "UnrealClient.h"
 
 namespace
 {
@@ -124,6 +126,11 @@ void AFarshoreGameMode::BeginPlay()
     {
         FTimerHandle Timer;
         GetWorldTimerManager().SetTimer(Timer, this, &AFarshoreGameMode::RunSmokeTest, 2.0f, false);
+    }
+    if (FParse::Param(FCommandLine::Get(), TEXT("FarshoreCapture")))
+    {
+        FTimerHandle Timer;
+        GetWorldTimerManager().SetTimer(Timer, this, &AFarshoreGameMode::CaptureFrame, 4.0f, false);
     }
 #endif
 }
@@ -262,6 +269,13 @@ void AFarshoreGameMode::SaveProgress()
 }
 
 #if WITH_DEV_AUTOMATION_TESTS
+void AFarshoreGameMode::CaptureFrame()
+{
+    FScreenshotRequest::RequestScreenshot(FPaths::ProjectSavedDir() / TEXT("FarshoreCapture.png"), false, false);
+    FTimerHandle Timer;
+    GetWorldTimerManager().SetTimer(Timer, []() { FPlatformMisc::RequestExit(false); }, 3.0f, false);
+}
+
 void AFarshoreGameMode::RunSmokeTest()
 {
     ACharacter* Player = UGameplayStatics::GetPlayerCharacter(this, 0);
